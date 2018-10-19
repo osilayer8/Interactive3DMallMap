@@ -1,13 +1,3 @@
-/**
- * main.js
- * http://www.codrops.com
- *
- * Licensed under the MIT license.
- * http://www.opensource.org/licenses/mit-license.php
- * 
- * Copyright 2016, Codrops
- * http://www.codrops.com
- */
 ;(function(window) {
 
 	'use strict';
@@ -48,6 +38,8 @@
 		},
 		// the mall element
 		mall = document.querySelector('.mall'),
+
+		ground = document.querySelector('.ground'),
 		// mall´s levels wrapper
 		mallLevelsEl = mall.querySelector('.levels'),
 		// mall´s levels
@@ -60,11 +52,11 @@
 		selectedLevel,
 		// navigation element wrapper
 		mallNav = document.querySelector('.mallnav'),
-		// show all mall´s levels ctrl
-		allLevelsCtrl = mallNav.querySelector('.mallnav__button--all-levels'),
+		// store building svg
+		storeBuilding = document.querySelector('.store'),
 		// levels navigation up/down ctrls
-		levelUpCtrl = mallNav.querySelector('.mallnav__button--up'),
-		levelDownCtrl = mallNav.querySelector('.mallnav__button--down'),
+		levelUpCtrl = document.querySelector('.mallnav__button--up'),
+		levelDownCtrl = document.querySelector('.mallnav__button--down'),
 		// pins
 		pins = [].slice.call(mallLevelsEl.querySelectorAll('.pin')),
 		// content element
@@ -83,23 +75,20 @@
 		spacesEl = spacesListEl.querySelector('ul.list'),
 		// all the spaces listed
 		spaces = [].slice.call(spacesEl.querySelectorAll('.list__item > a.list__link')),
+
+		floorNav = document.querySelector('.floorNav'),
+
+		floors = document.querySelectorAll('.floorNav > .floor'),
 		// reference to the current shows space (name set in the data-name attr of both the listed spaces and the pins on the map)
 		spaceref,
-		// sort by ctrls
-		sortByNameCtrl = document.querySelector('#sort-by-name'),
 		// listjs initiliazation (all mall´s spaces)
 		spacesList = new List('spaces-list', { valueNames: ['list__link', { data: ['level'] }, { data: ['category'] } ]} ),
 
 		// smaller screens:
-		// open search ctrl
-		openSearchCtrl = document.querySelector('button.open-search'),
 		// main container
-		containerEl = document.querySelector('.container'),
-		// close search ctrl
-		closeSearchCtrl = spacesListEl.querySelector('button.close-search');
+		containerEl = document.querySelector('.container');
 
 	function init() {
-		// init/bind events
 		initEvents();
 	}
 
@@ -115,8 +104,12 @@
 			});
 		});
 
-		// click on the show mall´s levels ctrl
-		allLevelsCtrl.addEventListener('click', function() {
+		storeBuilding.addEventListener('click', function() {
+			// shows all levels
+			classie.add(storeBuilding, 'open');
+		});
+
+		ground.addEventListener('click', function() {
 			// shows all levels
 			showAllLevels();
 		});
@@ -124,18 +117,6 @@
 		// navigating through the levels
 		levelUpCtrl.addEventListener('click', function() { navigate('Down'); });
 		levelDownCtrl.addEventListener('click', function() { navigate('Up'); });
-
-		// sort by name ctrl - add/remove category name (css pseudo element) from list and sorts the spaces by name 
-		sortByNameCtrl.addEventListener('click', function() {
-			if( this.checked ) {
-				classie.remove(spacesEl, 'grouped-by-category');
-				spacesList.sort('list__link');
-			}
-			else {
-				classie.add(spacesEl, 'grouped-by-category'); 
-				spacesList.sort('category');
-			}
-		});
 
 		// hovering a pin / clicking a pin
 		pins.forEach(function(pin) {
@@ -173,8 +154,7 @@
 
 			space.addEventListener('click', function(ev) {
 				ev.preventDefault();
-				// for smaller screens: close search bar
-				closeSearch();
+				classie.add(storeBuilding, 'open');
 				// open level
 				showLevel(level);
 				// open content for this space
@@ -182,15 +162,18 @@
 			});
 		});
 
-		// smaller screens: open the search bar
-		openSearchCtrl.addEventListener('click', function() {
-			openSearch();
+
+		floors.forEach(function(floor) {
+			var level = floor.getAttribute('select-level');
+
+			floor.addEventListener('click', function(ev) {
+				ev.preventDefault();
+				classie.add(storeBuilding, 'open');
+				// open level
+				showLevel(level);
+			});
 		});
 
-		// smaller screens: close the search bar
-		closeSearchCtrl.addEventListener('click', function() {
-			closeSearch();
-		});
 	}
 
 	/**
@@ -200,6 +183,8 @@
 		if( isExpanded ) {
 			return false;
 		}
+
+		classie.add(floorNav, 'mallnav--hidden');
 		
 		// update selected level val
 		selectedLevel = level;
@@ -240,6 +225,8 @@
 			return false;
 		}
 		isExpanded = false;
+
+		classie.remove(floorNav, 'mallnav--hidden');
 
 		classie.remove(mallLevels[selectedLevel - 1], 'level--current');
 		classie.remove(mallLevelsEl, 'levels--selected-' + selectedLevel);
@@ -324,7 +311,7 @@
 	 * Navigate through the mall´s levels
 	 */
 	function navigate(direction) {
-		if( isNavigating || !isExpanded || isOpenContentArea ) {
+		if( isNavigating ) {
 			return false;
 		}
 		isNavigating = true;
@@ -339,6 +326,16 @@
 		}
 		else if( direction === 'Down' && prevSelectedLevel < mallLevelsTotal ) {
 			++selectedLevel;
+		}
+		else if( direction === 'Up' && prevSelectedLevel === undefined ) {
+			showLevel(1);
+			isNavigating = false;
+			return false;
+		}
+		else if( direction === 'Down' && prevSelectedLevel === undefined ) {
+			showLevel(2);
+			isNavigating = false;
+			return false;
 		}
 		else {
 			isNavigating = false;	
@@ -358,7 +355,7 @@
 		onEndTransition(currentLevel, function() {
 			classie.remove(currentLevel, 'level--moveOut' + direction);
 			// solves rendering bug for the SVG opacity-fill property
-			setTimeout(function() {classie.remove(currentLevel, 'level--current');}, 60);
+			setTimeout(function() {classie.remove(currentLevel, 'level--current');}, 0);
 
 			classie.remove(mallLevelsEl, 'levels--selected-' + prevSelectedLevel);
 			classie.add(mallLevelsEl, 'levels--selected-' + selectedLevel);
@@ -374,6 +371,10 @@
 
 		// hide the previous level´s pins
 		removePins(currentLevel);
+
+		if( isOpenContentArea ) {
+			closeContentArea();
+		}
 	}
 
 	/**
@@ -441,9 +442,6 @@
 		classie.remove(contentCloseCtrl, 'content__button--hidden');
 		// resize mall area
 		classie.add(mall, 'mall--content-open');
-		// disable mall nav ctrls
-		classie.add(levelDownCtrl, 'boxbutton--disabled');
-		classie.add(levelUpCtrl, 'boxbutton--disabled');
 	}
 
 	/**
@@ -501,25 +499,6 @@
 		if( activeSpaceArea ) {
 			classie.remove(activeSpaceArea, 'map__space--selected');
 		}
-	}
-
-	/**
-	 * for smaller screens: open search bar
-	 */
-	function openSearch() {
-		// shows all levels - we want to show all the spaces for smaller screens 
-		showAllLevels();
-
-		classie.add(spacesListEl, 'spaces-list--open');
-		classie.add(containerEl, 'container--overflow');
-	}
-
-	/**
-	 * for smaller screens: close search bar
-	 */
-	function closeSearch() {
-		classie.remove(spacesListEl, 'spaces-list--open');
-		classie.remove(containerEl, 'container--overflow');
 	}
 	
 	init();
