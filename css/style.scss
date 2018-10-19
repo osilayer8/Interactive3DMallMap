@@ -1,3 +1,7 @@
+$font: #222222;
+$blue: #5191E5;
+$yellow: #F9D616;
+
 * {
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
@@ -21,7 +25,7 @@
 
 body {
   font-family: 'Avenir Next', Avenir, 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  color: #515158;
+  color: $font;
   background: #f0f0f0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -34,7 +38,7 @@ a {
 }
 
 button:hover {
-  color: #515158;
+  color: $font;
   outline: none;
 }
 
@@ -60,7 +64,7 @@ a:focus, button:focus {
   fill: currentColor;
 }
 
-.container {
+.mallContainer {
   position: relative;
   width: 100vw;
   height: 2520px;
@@ -215,12 +219,12 @@ div[class*="levels--selected"] {
     transition-timing-function: cubic-bezier(0.7, 0, 0.3, 1);
   }
   &:hover::after {
-    color: #515158;
+    color: $font;
   }
 }
 
 .level--current::after {
-  color: #515158;
+  color: $font;
   transform: rotateZ(-20deg) rotateZ(30deg) rotateX(-40deg) translateZ(5vmin) translateX(0vmin) translateY(0vmin);
 }
 
@@ -356,7 +360,7 @@ div[class*="levels--selected"] {
   border: 0;
   background: #666;
   &:hover, &:focus, &:active, &.boxbutton--disabled {
-    background: #fdd700;
+    background: $yellow;
     color:#333;
   }
 }
@@ -437,7 +441,7 @@ div[class*="levels--selected"] {
 
 /* Content */
 
-.content {
+.mallContent {
   position: absolute;
   top: 100%;
   width: 100%;
@@ -543,7 +547,7 @@ div[class*="levels--selected"] {
   height: 20%;
   left: 0;
   overflow: auto;
-  background-color: #0098ff;
+  background-color: $blue;
 }
 
 .search {
@@ -559,7 +563,7 @@ div[class*="levels--selected"] {
   padding: 1.315em 2em;
   color: #fff;
   border: 0;
-  background: #515158;
+  background: $font;
   border-radius: 0;
   &:focus {
     outline: none;
@@ -590,7 +594,7 @@ div[class*="levels--selected"] {
   cursor: pointer;
   opacity: 0;
   &:checked + .label__text {
-    color: #515158;
+    color: $font;
   }
 }
 
@@ -614,7 +618,7 @@ div[class*="levels--selected"] {
 
 .list__item--active {
   .circle {
-    background: #fdd700;
+    background: $yellow;
     svg {
       fill-opacity: 1;
     }
@@ -877,7 +881,7 @@ div[class*="levels--selected"] {
     fill: #333;
   }
   .pin-2 {
-    fill: #FFCC33;
+    fill: $yellow;
   }
 }
 
@@ -893,7 +897,7 @@ div[class*="levels--selected"] {
       right: 0;
     }
   }
-  .container {
+  .mallContainer {
     overflow: hidden;
   }
   .container--overflow, .content__item {
